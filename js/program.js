@@ -43,6 +43,28 @@ const oProgram = {
             return null;
         }
 
+    },
+
+    getShader(gl, paths, attLocations) {
+
+        return new Promise((resolve) => {
+            oProgram.loadShader(paths)
+            .then((shaders) => {
+                const vs = oProgram.createShader(gl, shaders[0], gl.VERTEX_SHADER);
+                const fs = oProgram.createShader(gl, shaders[1], gl.FRAGMENT_SHADER);
+    
+                const program = oProgram.createProgram(gl, vs, fs);
+                program.attLocations = [];
+
+                attLocations.forEach(attLocation => {
+                    program.attLocations.push(gl.getAttribLocation(program, attLocation));
+                });
+                
+                resolve(program);
+    
+            });
+        });
+    
     }
 
 };

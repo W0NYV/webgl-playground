@@ -1,55 +1,23 @@
 'use strict';
 
-let gl,
-    program,
-    vao,
-    indexBuffer,
-    indices;
+function createBuffers(gl, program, vertAttributes, indices) {
 
-function getShader() {
+    let buffers = {};
 
-    return new Promise((resolve) => {
-        oProgram.loadShader([
-            './vert.vs',
-            './frag.fs',
-        ])
-        .then((shaders) => {
-            const vs = oProgram.createShader(gl, shaders[0], gl.VERTEX_SHADER);
-            const fs = oProgram.createShader(gl, shaders[1], gl.FRAGMENT_SHADER);
-
-            program = oProgram.createProgram(gl, vs, fs);
-
-            program.aVertexPosition = gl.getAttribLocation(program, 'aVertexPosition');
-
-            resolve();
-
-        });
-    });
-
-}
-
-function initBuffers() {
-    
-    const vertices = [
-        -0.5, 0.5, 0,
-        -0.5, -0.5, 0,
-        0.5, -0.5, 0,
-        0.5, 0.5, 0
-    ];
-
-    indices = [0, 1, 2, 0, 2, 3];
-
-    vao = gl.createVertexArray();
+    const vao = gl.createVertexArray();
     gl.bindVertexArray(vao);
 
-    const squareVertexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+    const vertexBuffers = [];
 
-    gl.enableVertexAttribArray(program.aVertexPosition);
-    gl.vertexAttribPointer(program.aVertexPosition, 3, gl.FLOAT, false, 0, 0);
-    
-    indexBuffer = gl.createBuffer();
+    for(let i = 0; i < vertAttributes.length; i++) {
+        vertexBuffers.push(gl.createBuffer());
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffers[i]);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertAttributes[i][0]), gl.STATIC_DRAW);
+        gl.enableVertexAttribArray(program.attLocations[i]);
+        gl.vertexAttribPointer(program.attLocations[i], vertAttributes[i][1], gl.FLOAT, false, 0, 0);
+    }
+
+    const indexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
@@ -57,9 +25,14 @@ function initBuffers() {
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 
+    buffers.vao = vao;
+    buffers.indexBuffer = indexBuffer;
+
+    return buffers;
+
 }
 
-function draw() {
+function draw(gl, vao, indicesLength) {
     
     gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -67,7 +40,7 @@ function draw() {
 
     gl.bindVertexArray(vao);
 
-    gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
+    gl.drawElements(gl.TRIANGLES, indicesLength, gl.UNSIGNED_SHORT, 0);
 
     gl.bindVertexArray(null);
 
@@ -75,16 +48,37 @@ function draw() {
 
 function init() {
 
+    const vertices = [
+        -0.5, 0.5, 0,
+        -0.5, -0.5, 0,
+        0.5, -0.5, 0,
+        0.5, 0.5, 0
+    ];
+
+    const colors = [
+        1.0, 0.0, 0.0,
+        0.0, 1.0, 0.0,
+        0.0, 0.0, 1.0,
+        1.0, 1.0, 1.0
+    ];
+
+    const vertAttributes = [[vertices, 3], [colors, 3]];
+
+    const indices = [0, 1, 2, 0, 2, 3];
+
+    const attLocations = ['aVertexPosition',
+                          'aVertexColor'];
+
     const canvas = oUtils.getCanvas('webgl-canvas');
     oUtils.autoResizeCanvas(canvas);
 
-    gl = oUtils.getGLContext(canvas);
+    const gl = oUtils.getGLContext(canvas);
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
-    getShader().then(() => {
-        initBuffers();
-        draw();
+    oProgram.getShader(gl, ['./vert.vs', './frag.fs'], attLocations).then((program) => {
+        const buffers = createBuffers(gl, program, vertAttributes, indices);
+        draw(gl, buffers.vao, indices.length);
     })
     
 }
