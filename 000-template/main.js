@@ -32,8 +32,12 @@ function createBuffers(gl, program, vertAttributes, indices) {
 
 }
 
-function draw(gl, vao, indicesLength) {
+function draw(gl, vao, indicesLength, program) {
+
+    let uniValues = [[1.0]];
     
+    setUniform(gl, uniValues, program.uniLocations, program.uniTypes);
+
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -43,6 +47,22 @@ function draw(gl, vao, indicesLength) {
     gl.drawElements(gl.TRIANGLES, indicesLength, gl.UNSIGNED_SHORT, 0);
 
     gl.bindVertexArray(null);
+
+}
+
+function setUniform(gl, value, uniLocations, uniTypes) {
+
+    value.forEach((v, index) => {
+        
+        const type = uniTypes[index];
+        
+        if(type.includes('Matrix') === true) {
+            gl[type](uniLocations[index], false, v);
+        } else {
+            gl[type](uniLocations[index], v);
+        }
+        
+    });
 
 }
 
@@ -69,6 +89,8 @@ function init() {
     const attLocations = ['aVertexPosition',
                           'aVertexColor'];
 
+    const uniLocations = [['test', 'uniform1fv']];    
+
     const canvas = oUtils.getCanvas('webgl-canvas');
     oUtils.autoResizeCanvas(canvas);
 
@@ -76,9 +98,11 @@ function init() {
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
-    oProgram.getShader(gl, ['./vert.vs', './frag.fs'], attLocations).then((program) => {
+    oProgram.getShader(gl, ['./vert.vs', './frag.fs'], attLocations, uniLocations).then((program) => {
+
         const buffers = createBuffers(gl, program, vertAttributes, indices);
-        draw(gl, buffers.vao, indices.length);
+        draw(gl, buffers.vao, indices.length, program);
+
     })
     
 }
