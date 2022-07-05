@@ -45,7 +45,7 @@ const oProgram = {
 
     },
 
-    getShader(gl, paths, attLocations) {
+    getShader(gl, paths, attLocations, uniLocations) {
 
         return new Promise((resolve) => {
             oProgram.loadShader(paths)
@@ -55,11 +55,19 @@ const oProgram = {
     
                 const program = oProgram.createProgram(gl, vs, fs);
                 program.attLocations = [];
+                program.uniLocations = [];
+                program.uniTypes = [];
 
                 attLocations.forEach(attLocation => {
                     program.attLocations.push(gl.getAttribLocation(program, attLocation));
                 });
                 
+                uniLocations.forEach(uniLocation => {
+                    program.uniLocations.push(gl.getUniformLocation(program, uniLocation[0]));
+                    program.uniTypes.push(uniLocation[1]);
+                    
+                });
+
                 resolve(program);
     
             });
