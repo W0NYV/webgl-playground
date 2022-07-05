@@ -60,6 +60,8 @@ function draw(gl, vao, indicesLength, program) {
     let pMatrix = m.identity(m.create());
     let mvpMatrix = m.identity(m.create());
 
+    m.rotate(mMatrix, nowTime, [0, 1, 0], mMatrix);
+
     m.lookAt([0.0, 0.0, 3.0], [0, 0, 0], [0, 1, 0], vMatrix);
     m.perspective(90, gl.canvas.width / gl.canvas.height, 0.1, 100, pMatrix);
 
