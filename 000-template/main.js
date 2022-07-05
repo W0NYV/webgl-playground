@@ -34,7 +34,20 @@ function createBuffers(gl, program, vertAttributes, indices) {
 
 function draw(gl, vao, indicesLength, program) {
 
-    let uniValues = [[1.0]];
+    let m = new matIV();
+    let mMatrix = m.identity(m.create());
+    let vMatrix = m.identity(m.create());
+    let pMatrix = m.identity(m.create());
+    let mvpMatrix = m.identity(m.create());
+
+    m.lookAt([0.0, 0.0, 3.0], [0, 0, 0], [0, 1, 0], vMatrix);
+    m.perspective(90, gl.canvas.width / gl.canvas.height, 0.1, 100, pMatrix);
+
+    m.multiply(pMatrix, vMatrix, mvpMatrix);
+    m.multiply(mvpMatrix, mMatrix, mvpMatrix);
+
+
+    let uniValues = [[1.0], mvpMatrix];
     
     setUniform(gl, uniValues, program.uniLocations, program.uniTypes);
 
@@ -89,7 +102,8 @@ function init() {
     const attLocations = ['aVertexPosition',
                           'aVertexColor'];
 
-    const uniLocations = [['test', 'uniform1fv']];    
+    const uniLocations = [['test', 'uniform1fv'],
+                          ['mvpMatrix', 'uniformMatrix4fv']];    
 
     const canvas = oUtils.getCanvas('webgl-canvas');
     oUtils.autoResizeCanvas(canvas);
