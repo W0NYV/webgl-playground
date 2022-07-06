@@ -4,6 +4,11 @@ let render,
     beginTime,
     nowTime;
 
+let gui;
+let guiObj = {
+    fixedLight: true
+}
+
 function draw(gl, vao, indicesLength, program) {
 
     let m = new matIV();
@@ -29,7 +34,8 @@ function draw(gl, vao, indicesLength, program) {
     let uniValues = [[nowTime], 
                      mvpMatrix,
                      nMatrix,
-                     [-0.577, -0.577, -0.577]];
+                     [-0.577, -0.577, -0.577],
+                     guiObj.fixedLight];
     
     glMethods.setUniform(gl, uniValues, program.uniLocations, program.uniTypes);
 
@@ -59,6 +65,9 @@ function init() {
 
     beginTime = Date.now();
 
+    gui = new lil.GUI();
+    gui.add(guiObj, 'fixedLight');
+
     const attLocations = ['aVertexPosition',
                           'aVertexTexCoord',
                           'aVertexNormal'];
@@ -66,7 +75,8 @@ function init() {
     const uniLocations = [['time', 'uniform1fv'],
                           ['mvpMatrix', 'uniformMatrix4fv'],
                           ['nMatrix', 'uniformMatrix4fv'],
-                          ['lightDirection', 'uniform3fv']];    
+                          ['lightDirection', 'uniform3fv'],
+                          ['fixedLight', 'uniform1i']];    
 
     const canvas = utils.getCanvas('webgl-canvas');
     utils.autoResizeCanvas(canvas);

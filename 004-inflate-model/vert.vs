@@ -16,8 +16,8 @@ const float PI = acos(-1.0);
 
 void main(void){
 
-    //法線行列を法線にかける意味は？
-    //vNormal = vec3(nMatrix * vec4(aVertexNormal, 1.0));
+    //法線行列を法線にかけるとライトが回る
+    //vNormal = vec3(nMatrix * vec4(aVertexNormal, 0.0));
     vNormal = aVertexNormal;
 
     vTexCoord = aVertexTexCoord;
