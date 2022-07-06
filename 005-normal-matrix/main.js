@@ -69,8 +69,8 @@ function init() {
     gui.add(guiObj, 'fixedLight');
 
     const attLocations = ['aVertexPosition',
-                          'aVertexTexCoord',
-                          'aVertexNormal'];
+                          'aVertexNormal',                    
+                          'aVertexTexCoord'];
 
     const uniLocations = [['time', 'uniform1fv'],
                           ['mvpMatrix', 'uniformMatrix4fv'],

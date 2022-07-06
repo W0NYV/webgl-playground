@@ -99,7 +99,7 @@ const glMethods = {
     createBuffers(gl, program, vertAttributes, indices) {
 
         let buffers = {};
-    
+
         const vao = gl.createVertexArray();
         gl.bindVertexArray(vao);
     
@@ -123,9 +123,9 @@ const glMethods = {
     
         buffers.vao = vao;
         buffers.indexBuffer = indexBuffer;
+        buffers.indices = indices;
     
         return buffers;
-        
     
     },
 
@@ -136,10 +136,11 @@ const glMethods = {
 
             let vertAttributes = [];
             vertAttributes.push([data.position, 3]);
-            vertAttributes.push([data.texCoord, 2]);
 
             const normal = utils.calculateNormals(data.position, data.index);
             vertAttributes.push([normal, 3]);
+
+            vertAttributes.push([data.texCoord, 2]);
 
             let buffers = {};
     
@@ -147,7 +148,6 @@ const glMethods = {
             gl.bindVertexArray(vao);
         
             const vertexBuffers = [];
-        
             for(let i = 0; i < vertAttributes.length; i++) {
                 vertexBuffers.push(gl.createBuffer());
                 gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffers[i]);
@@ -167,10 +167,77 @@ const glMethods = {
             buffers.vao = vao;
             buffers.indexBuffer = indexBuffer;
             buffers.indices = data.index;
+            buffers.vertAttributes = vertAttributes;
             
             return buffers; 
 
-        })    
+        });
+    },
+
+    getNormalVectors(position, normal, length) {
+        let norVecs = {};
+        norVecs.p = [];
+        norVecs.i = [];
+
+        // console.log(position);
+        // console.log(normal);
+
+        if(position.length === normal.length) {
+            for(let i = 0; i < position.length; i+=3) {
+                norVecs.p.push(position[i]);
+                norVecs.p.push(position[i+1]);
+                norVecs.p.push(position[i+2]);
+                
+                norVecs.p.push(position[i]+normal[i]*length);
+                norVecs.p.push(position[i+1]+normal[i+1]*length);
+                norVecs.p.push(position[i+2]+normal[i+2]*length);
+
+                norVecs.i.push(i);
+                norVecs.i.push(i+1);
+                norVecs.i.push(i+2);
+            }
+        }
+
+        return norVecs;
+
+    },
+
+    getNormalVectors4Json(filePath, length) {
+        return fetch(filePath)
+        .then(res => res.json())
+        .then(data => {
+            let norVecs = {};
+            norVecs.p = [];
+            norVecs.i = []; 
+        
+            const position = data.position;
+            const normal = utils.calculateNormals(data.position, data.index);
+    
+            console.log(position);
+            console.log(normal);
+    
+            if(position.length === normal.length) {
+                for(let i = 0; i < position.length; i+=3) {
+                    norVecs.p.push(position[i]);
+                    norVecs.p.push(position[i+1]);
+                    norVecs.p.push(position[i+2]);
+                    
+                    norVecs.p.push(position[i]+normal[i]*length);
+                    norVecs.p.push(position[i+1]+normal[i+1]*length);
+                    norVecs.p.push(position[i+2]+normal[i+2]*length);
+    
+                    norVecs.i.push(i);
+                    norVecs.i.push(i+1);
+                    norVecs.i.push(i+2);
+                    
+                }
+            }
+            
+            console.log(norVecs);
+            return norVecs;
+
+        })
+
     }
 
 };

@@ -60,8 +60,8 @@ function init() {
     beginTime = Date.now();
 
     const attLocations = ['aVertexPosition',
-                          'aVertexTexCoord',
-                          'aVertexNormal'];
+                          'aVertexNormal',                    
+                          'aVertexTexCoord'];
 
     const uniLocations = [['time', 'uniform1fv'],
                           ['mvpMatrix', 'uniformMatrix4fv'],
