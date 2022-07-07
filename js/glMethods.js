@@ -209,12 +209,11 @@ const glMethods = {
             let norVecs = {};
             norVecs.p = [];
             norVecs.i = []; 
+            norVecs.e = [];
+            norVecs.n = [];
         
             const position = data.position;
             const normal = utils.calculateNormals(data.position, data.index);
-    
-            console.log(position);
-            console.log(normal);
     
             if(position.length === normal.length) {
                 for(let i = 0; i < position.length; i+=3) {
@@ -231,9 +230,22 @@ const glMethods = {
                     norVecs.i.push(i+2);
                     
                 }
+
+                for(let i = 0; i < norVecs.p.length; i+=6) {
+                    norVecs.e.push([1.0]);
+                    norVecs.e.push([1.0]);
+                    norVecs.e.push([1.0]);
+                    norVecs.e.push([0.0]);
+                    norVecs.e.push([0.0]);
+                    norVecs.e.push([0.0]);
+                }
+
+                for(let i = 0; i < norVecs.p.length; i++) {
+                    norVecs.n.push([i]);
+                }
+
             }
             
-            console.log(norVecs);
             return norVecs;
 
         })
